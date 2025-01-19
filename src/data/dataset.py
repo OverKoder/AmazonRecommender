@@ -1,4 +1,4 @@
-from transformers import BertTokenizerFast
+from transformers import AutoTokenizer
 from torch.utils.data import Dataset
 from torch import from_numpy
 
@@ -8,10 +8,10 @@ class AmazonDataset(Dataset):
         super().__init__()
 
         # Tokenizer
-        self.tokenizer = BertTokenizerFast.from_pretrained("setu4993/LaBSE")
+        self.tokenizer = AutoTokenizer.from_pretrained("ydshieh/tiny-random-gptj-for-sequence-classification")
 
         # Data and targets
-        self.data = self.tokenizer(data, return_tensors="pt", padding=True)
+        self.data = data
         self.targets = from_numpy(targets)
 
         return
@@ -19,8 +19,8 @@ class AmazonDataset(Dataset):
     
     def __getitem__(self, index):
 
-        # Reviews are already tokenized
-        review = self.data[index]
+        # Tokenize reviews
+        review = self.tokenizer(self.data[index], return_tensors="pt", max_length = 512, padding = "max_length", truncation = True)
         target = self.targets[index]
 
         return review, target

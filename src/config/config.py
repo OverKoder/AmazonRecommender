@@ -27,3 +27,5 @@ CATEGORY2IDX = {
 IDX2CATEGORY = {
 
 }
+
+RAW_DATA_PATH = "data.gz"

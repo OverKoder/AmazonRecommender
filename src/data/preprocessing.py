@@ -7,6 +7,8 @@ import sys
 from config.config import CATEGORY2IDX
 
 import pandas as pd
+import numpy as np
+from transformers import AutoTokenizer
 
 PACKAGE_ROOT = Path(os.path.abspath(os.path.dirname(__file__))).parent.parent
 sys.path.append(str(PACKAGE_ROOT))
@@ -31,8 +33,9 @@ def get_data(path):
     for i, d in enumerate(parse(path)):
         data[i] = d
         i += 1
-    
+
     return pd.DataFrame.from_dict(data, orient='index')
+
 
 def preprocess(data: pd.DataFrame):
     """
@@ -44,11 +47,11 @@ def preprocess(data: pd.DataFrame):
     data.drop(columns=['also_buy', 'also_view', 'asin', 'image', 'price'], inplace = True)
 
     # Split into data and targets
-    targets = data['main_cat'].apply(lambda x: CATEGORY2IDX[x]).to_numpy()
+    targets = data['main_cat'].apply(lambda x: CATEGORY2IDX[x])
     data.drop(columns = ['main_cat'], inplace = True)
 
-    new_data = []
-    for row in data.iterrows():
+    lengths = []
+    for i, row in enumerate(data.iterrows()):
 
         row = row[1].values
         sequence = []
@@ -60,7 +63,20 @@ def preprocess(data: pd.DataFrame):
             else:
                 for subelem in elem:
                     sequence.append(subelem.replace('.',''))
-        
-        new_data.append('. '.join(sequence))
 
-    return new_data, targets
+        # Join all sequence parts
+        sequence = '. '.join(sequence)
+        data.loc[i, 'sequence'] = sequence
+        lengths.append(len(sequence))
+
+    data['lengths'] = lengths
+
+    # Remove rows with length outside of quantile
+    remove_index = data[data['lengths'] > data['lengths'].quantile(0.99)].index
+    data.drop(remove_index, inplace=True)
+    targets.drop(remove_index, inplace = True)
+
+    # Get remaining sequences
+    data = data['sequence'].values
+
+    return data, targets.to_numpy()
