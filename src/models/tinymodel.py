@@ -4,7 +4,7 @@ from torchmetrics.classification import MulticlassAccuracy
 
 class TinyModel(pl.LightningModule):
     """
-    Wrapper class for LongFormer model.
+    Wrapper class for huggingface model.
     """
     def __init__(self, model, num_classes):
         super().__init__()
@@ -24,7 +24,7 @@ class TinyModel(pl.LightningModule):
         # Compute loss and log it
         self.log("train_loss", outputs.loss, prog_bar=True, on_epoch=True)
 
-        # Log F1-Score
+        # Log Log accuracy
         train_acc = self.metric(outputs.logits, labels)
         self.log('train_acc', train_acc, on_step=False, on_epoch=True)
 
@@ -38,9 +38,23 @@ class TinyModel(pl.LightningModule):
         # Compute loss and log it
         self.log("val_loss", outputs.loss, prog_bar=True, on_epoch=True)
 
-        # Log F1-Score
+        # Log accuracy
         val_acc = self.metric(outputs.logits, labels)
         self.log('val_acc', val_acc, on_step=False, on_epoch=True)
+
+        return outputs.loss
+
+    def test_step(self, batch, batch_idx):
+        inputs, labels = batch
+
+        outputs = self.model(input_ids = inputs['input_ids'].squeeze(1), attention_mask = inputs['attention_mask'].squeeze(1), labels = labels)
+
+        # Compute loss and log it
+        self.log("test_loss", outputs.loss, prog_bar=True, on_epoch=True)
+
+        # Log accuracy
+        test_acc = self.metric(outputs.logits, labels)
+        self.log('test_acc', test_acc, on_step=False, prog_bar=True, on_epoch=True)
 
         return outputs.loss
 
