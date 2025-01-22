@@ -1,25 +1,41 @@
 import requests
+import json
+import random
 
+CATEGORIES = ['also_buy', 'also_view', 'asin', 'brand', 'category', 'description','feature', 'image', 'price', 'title', 'main_cat']
 def main():
 
     print("Testing API...")
     url = "http://127.0.0.1:8000/"
 
-    data = {
-        "also_buy": ["B071WSK6R8", "B006K8N5WQ", "B01ASDJLX0", "B00658TPYI"],
-        "also_view": [],
-        "asin": "B00N31IGPO",
-        "brand": "Speed Dealer Customs",
-        "category": ["Automotive", "Replacement Parts", "Shocks, Struts & Suspension", "Tie Rod Ends & Parts", "Tie Rod Ends"],
-        "description": ["Universal heim joint tie rod weld in tube adapter bung. Made in the USA by Speed Dealer Customs. Tube adapter measurements are as in the title, please contact us about any questions you may have."],
-        "feature": ["Completely CNC machined 1045 Steel", "Single RH Tube Adapter", "Thread: 3/4-16", "O.D.: 1-1/4", "Fits 1-1/4\" tube with .120\" wall thickness"],
-        "image": [],
-        "price": "",
-        "title": "3/4-16 RH Weld In Threaded Heim Joint Tube Adapter Bung for 1-1/4&quot; Dia by .120 Wall Tube",
-        "main_cat": "Automotive"
-        }
+    # Select random data
+    random_idx = str(random.randint(0, 100))
+    with open('src/data/demo_data.json', 'r') as j:
+        demo_data = json.loads(j.read())
+
+    true_category = demo_data['main_cat'][random_idx]
+    demo_data = {
+        'also_buy': demo_data['also_buy'][random_idx],
+        'also_view': demo_data['also_view'][random_idx],
+        'asin': demo_data['asin'][random_idx],
+        'brand': demo_data['brand'][random_idx],
+        'category': demo_data['category'][random_idx],
+        'description': demo_data['description'][random_idx],
+        'feature': demo_data['feature'][random_idx],
+        'image': demo_data['image'][random_idx],
+        'price': demo_data['price'][random_idx],
+        'title': demo_data['title'][random_idx],
+    }
     
-    response = requests.post(url, json=data)
-    print(f"Response:{response.text}")
+    print(f"Data selected: {random_idx}")
+    print(f"True category: {true_category}")
+
+    # Get prediction
+    response = requests.post(url, json=demo_data)
+    response = json.loads(response.text)
+    print(f"Response, prediction: {response['Predicted category']}")
+
+    return
+
 if __name__ == "__main__":
     main()
