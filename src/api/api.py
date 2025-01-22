@@ -40,7 +40,7 @@ async def predict_category(review: Review):
 	
     data = review.model_dump()
 	
-    data = '. '.join([data['brand']] + data['category'] + data['description'] + [data['title']])
+    data = '. '.join([data['brand']] + data['description'] + [data['title']])
     data = TOKENIZER(data, return_tensors="pt", max_length = MAX_LENGTH, padding = "max_length", truncation = True)
 
 	# Make prediction

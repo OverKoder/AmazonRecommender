@@ -44,7 +44,7 @@ def preprocess(data: pd.DataFrame):
 
     # Current design choice: Ignore also_buy, also_view, asin, images and price columns
     # 52% of brands are included in the title
-    data.drop(columns=['also_buy', 'also_view', 'asin', 'image', 'price'], inplace = True)
+    data.drop(columns=['also_buy', 'also_view', 'asin', 'category', 'image', 'price'], inplace = True)
 
     # Split into data and targets
     targets = data['main_cat'].apply(lambda x: CATEGORY2IDX[x])

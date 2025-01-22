@@ -20,7 +20,7 @@ val_data, test_data, val_labels, test_labels = train_test_split(val_test_data, v
 test_dataset = AmazonDataset(test_data, test_labels)
 test_loader = DataLoader(test_dataset, batch_size = 64, shuffle = False, num_workers = 4, pin_memory = True)
 
-# Model (test accuracy = 0.8565)
+# Model (test accuracy = 0.7374)
 model = AutoModelForSequenceClassification.from_pretrained("ydshieh/tiny-random-gptj-for-sequence-classification", num_labels = len(CATEGORY2IDX), ignore_mismatched_sizes=True)
 model = TinyModel(model = model, num_classes = len(CATEGORY2IDX))
 

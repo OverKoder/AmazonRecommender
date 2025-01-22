@@ -28,11 +28,13 @@ def main():
     }
     
     print(f"Data selected: {random_idx}")
-    print(f"True category: {true_category}")
 
     # Get prediction
     response = requests.post(url, json=demo_data)
+    print(f"Status: {response.status_code}")
+
     response = json.loads(response.text)
+    print(f"True category: {true_category}")
     print(f"Response, prediction: {response['Predicted category']}")
 
     return
